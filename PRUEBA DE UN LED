@@ -1,0 +1,29 @@
+import RPi.GPIO as GPIO
+import time
+
+# Configuración de los pines
+Pin_Sensor = 5  # Pin GPIO para la señal del sensor de obstáculos
+Pin_Led = 25    # Pin GPIO para el LED
+
+# Configuración de la biblioteca RPi.GPIO
+GPIO.setmode(GPIO.BCM)  # Usar numeración BCM de los pines GPIO
+
+# Configurar el pin del sensor como entrada y el pin del LED como salida
+GPIO.setup(Pin_Sensor, GPIO.IN)
+GPIO.setup(Pin_Led, GPIO.OUT)
+
+try:
+    while True:
+        sensor_state = GPIO.input(Pin_Sensor)
+        if sensor_state == 0:  # Si el sensor detecta un obstáculo
+            GPIO.output(Pin_Led, GPIO.HIGH)  # Encender el LED
+        else:  # Si el sensor no detecta un obstáculo
+            GPIO.output(Pin_Led, GPIO.LOW)   # Apagar el LED
+        
+        time.sleep(0.1)  # Pequeña pausa para evitar una carga excesiva de la CPU
+
+except KeyboardInterrupt:
+    pass  # Permitir salir del bucle con Ctrl+C
+
+finally:
+    GPIO.cleanup()  # Limpiar la configuración de los pines GPIO
