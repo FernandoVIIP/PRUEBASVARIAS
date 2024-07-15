@@ -27,3 +27,6 @@ except KeyboardInterrupt:
 
 finally:
     GPIO.cleanup()  # Limpiar la configuración de los pines GPIO
+
+
+/// ESTA ES LA PRUEBA EN LA RASPERRY CON UN LED Y UN INFRARROJO
