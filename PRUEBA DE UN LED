@@ -29,4 +29,60 @@ finally:
     GPIO.cleanup()  # Limpiar la configuración de los pines GPIO
 
 
-/// ESTA ES LA PRUEBA EN LA RASPERRY CON UN LED Y UN INFRARROJO
+# ESTA ES LA PRUEBA EN LA RASPERRY CON UN LED Y UN INFRARROJO
+
+
+
+
+
+
+import serial
+import time
+from gpiozero import Servo, LED
+
+# Configuración del puerto serial
+ser = serial.Serial('/dev/ttyUSB0', 9600)  # Ajusta el puerto según sea necesario
+
+# Inicialización del servo y el LED
+myservo = Servo(17)  # Ajusta el pin GPIO según sea necesario
+led = LED(27)  # Ajusta el pin GPIO según sea necesario
+
+valid_tag = "AB123456789A"  # Define la ID de etiqueta válida aquí
+
+print("Please scan your RFID TAG")
+
+try:
+    while True:
+        id = ""
+        count = 0
+
+        while ser.in_waiting > 0:
+            c = ser.read().decode('utf-8')
+            count += 1
+            id += c
+
+            if count == 12:
+                print(id)
+                if id == valid_tag:
+                    print("Valid TAG")
+                    led.on()
+                    myservo.value = 1  # Mueve el servo a 180 grados
+                    time.sleep(3)
+                    myservo.value = -1  # Mueve el servo a 0 grados
+                else:
+                    led.off()
+                    print("Invalid TAG")
+                    myservo.value = -1  # Asegúrate de que el servo esté en 0 grados
+
+                # Reiniciar variables
+                count = 0
+                id = ""
+
+        time.sleep(0.5)  # Pequeña pausa para evitar una carga excesiva de la CPU
+
+except KeyboardInterrupt:
+    pass  # Permitir salir del bucle con Ctrl+C
+
+finally:
+    ser.close()  # Cerrar el puerto serial
+
