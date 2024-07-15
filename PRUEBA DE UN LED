@@ -117,7 +117,7 @@ class EstacionamientoGUI:
             cajon.grid(row=i // 2, column=i % 2, padx=15, pady=15)
             cajon.bind("<Button-1>", lambda event, widget=cajon: self.cambiar_estado(widget))
 
-    def cambiar_estado(self, cajon):
+    def cambiar_estado(sensor_state, cajon):
         color_actual = cajon.cget("bg")
         nuevo_color = "red" if color_actual == "green" else "green"
         cajon.config(bg=nuevo_color)
