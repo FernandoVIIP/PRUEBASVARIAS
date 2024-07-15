@@ -49,6 +49,9 @@ GPIO.setup(led_pin, GPIO.OUT)
 # Configura el lector RFID
 MIFAREReader = MFRC522.MFRC522()
 
+# ID de la tarjeta permitida
+authorized_card_id = [0xCB, 0xD7, 0xBA, 0x79]  # ID en formato hexadecimal
+
 try:
     while True:
         # Lógica de lectura RFID
@@ -60,7 +63,7 @@ try:
             (status, uid) = MIFAREReader.MFRC522_Anticoll()
 
             # Verificar si es el ID deseado
-            if uid == [0x**REEMPLAZAR CON TU ID DE TARJETA**]:  # Reemplazar con el ID correcto
+            if uid == authorized_card_id:
                 print("Acceso permitido")
                 
                 # Activar servo a 180 grados
@@ -82,4 +85,3 @@ try:
 
 except KeyboardInterrupt:
     GPIO.cleanup()
-
