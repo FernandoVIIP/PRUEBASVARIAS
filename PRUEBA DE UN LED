@@ -85,3 +85,45 @@ try:
 
 except KeyboardInterrupt:
     GPIO.cleanup()
+
+
+
+
+#
+
+import tkinter as tk
+
+class EstacionamientoGUI:
+    def _init_(self, root):
+        self.root = root
+        self.root.title("Estacionamiento - Universidad Politécnica de Tapachula")
+
+        self.docentes_frame = tk.LabelFrame(self.root, text="Docentes", padx=30, pady=30, font=("Arial", 12, "bold"))
+        self.docentes_frame.grid(row=0, column=0, padx=20, pady=20, sticky="nsew")
+        self.crear_cajones_estacionamiento(self.docentes_frame, 5, "D")
+
+        self.estudiantes_frame = tk.LabelFrame(self.root, text="Estudiantes", padx=30, pady=30, font=("Arial", 12, "bold"))
+        self.estudiantes_frame.grid(row=0, column=1, padx=20, pady=20, sticky="nsew")
+        self.crear_cajones_estacionamiento(self.estudiantes_frame, 5, "E")
+
+        self.administrativos_frame = tk.LabelFrame(self.root, text="Administrativos", padx=30, pady=30, font=("Arial", 12, "bold"))
+        self.administrativos_frame.grid(row=0, column=2, padx=20, pady=20, sticky="nsew")
+        self.crear_cajones_estacionamiento(self.administrativos_frame, 5, "A")
+
+    def crear_cajones_estacionamiento(self, frame, cantidad, tipo):
+        for i in range(cantidad):
+            cajon_texto = tipo + str(i+1)
+            cajon = tk.Label(frame, text=cajon_texto, padx=40, pady=40, relief=tk.RAISED, borderwidth=2, bg="green", font=("Arial", 10, "bold"))
+            cajon.grid(row=i // 2, column=i % 2, padx=15, pady=15)
+            cajon.bind("<Button-1>", lambda event, widget=cajon: self.cambiar_estado(widget))
+
+    def cambiar_estado(self, cajon):
+        color_actual = cajon.cget("bg")
+        nuevo_color = "red" if color_actual == "green" else "green"
+        cajon.config(bg=nuevo_color)
+
+if _name_ == "_main_":
+    root = tk.Tk()
+    app = EstacionamientoGUI(root)
+    root.mainloop()
+
