@@ -33,56 +33,53 @@ finally:
 
 
 
-
-
-
-import serial
+import RPi.GPIO as GPIO
+import MFRC522
+import signal
 import time
-from gpiozero import Servo, LED
 
-# Configuración del puerto serial
-ser = serial.Serial('/dev/ttyUSB0', 9600)  # Ajusta el puerto según sea necesario
+# Configura los pines GPIO
+servo_pin = 17
+led_pin = 18
 
-# Inicialización del servo y el LED
-myservo = Servo(17)  # Ajusta el pin GPIO según sea necesario
-led = LED(27)  # Ajusta el pin GPIO según sea necesario
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(servo_pin, GPIO.OUT)
+GPIO.setup(led_pin, GPIO.OUT)
 
-valid_tag = "AB123456789A"  # Define la ID de etiqueta válida aquí
-
-print("Please scan your RFID TAG")
+# Configura el lector RFID
+MIFAREReader = MFRC522.MFRC522()
 
 try:
     while True:
-        id = ""
-        count = 0
+        # Lógica de lectura RFID
+        (status, TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
+        if status == MIFAREReader.MI_OK:
+            print("Tarjeta detectada")
 
-        while ser.in_waiting > 0:
-            c = ser.read().decode('utf-8')
-            count += 1
-            id += c
+            # Obtener ID de la tarjeta
+            (status, uid) = MIFAREReader.MFRC522_Anticoll()
 
-            if count == 12:
-                print(id)
-                if id == valid_tag:
-                    print("Valid TAG")
-                    led.on()
-                    myservo.value = 1  # Mueve el servo a 180 grados
-                    time.sleep(3)
-                    myservo.value = -1  # Mueve el servo a 0 grados
-                else:
-                    led.off()
-                    print("Invalid TAG")
-                    myservo.value = -1  # Asegúrate de que el servo esté en 0 grados
-
-                # Reiniciar variables
-                count = 0
-                id = ""
-
-        time.sleep(0.5)  # Pequeña pausa para evitar una carga excesiva de la CPU
+            # Verificar si es el ID deseado
+            if uid == [0x**REEMPLAZAR CON TU ID DE TARJETA**]:  # Reemplazar con el ID correcto
+                print("Acceso permitido")
+                
+                # Activar servo a 180 grados
+                p = GPIO.PWM(servo_pin, 50)
+                p.start(2.5)  # Posición inicial del servo
+                p.ChangeDutyCycle(7.5)  # Gira a 180 grados
+                time.sleep(1)
+                
+                # Encender el LED
+                GPIO.output(led_pin, GPIO.HIGH)
+                time.sleep(3)
+                GPIO.output(led_pin, GPIO.LOW)
+                
+                p.stop()  # Detener el servo
+            else:
+                print("Acceso denegado")
+        
+        time.sleep(0.1)
 
 except KeyboardInterrupt:
-    pass  # Permitir salir del bucle con Ctrl+C
-
-finally:
-    ser.close()  # Cerrar el puerto serial
+    GPIO.cleanup()
 
