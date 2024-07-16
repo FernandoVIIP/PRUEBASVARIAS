@@ -188,3 +188,65 @@ except KeyboardInterrupt:
 finally:
     GPIO.cleanup()  # Limpiar la configuración de los pines GPIO
     root.mainloop()
+
+
+
+
+
+
+
+
+#4 INFRARROJOS Y 4 LEDS
+
+
+
+
+import RPi.GPIO as GPIO
+import time
+
+# Configuración de los pines
+Pin_Sensor1 = 5   # Pin GPIO para la señal del sensor de obstáculos 1
+Pin_Sensor2 = 6   # Pin GPIO para la señal del sensor de obstáculos 2
+Pin_Sensor3 = 13  # Pin GPIO para la señal del sensor de obstáculos 3
+Pin_Sensor4 = 19  # Pin GPIO para la señal del sensor de obstáculos 4
+
+Pin_Led1 = 25     # Pin GPIO para el LED 1
+Pin_Led2 = 12     # Pin GPIO para el LED 2
+Pin_Led3 = 16     # Pin GPIO para el LED 3
+Pin_Led4 = 20     # Pin GPIO para el LED 4
+
+# Configuración de la biblioteca RPi.GPIO
+GPIO.setmode(GPIO.BCM)  # Usar numeración BCM de los pines GPIO
+
+# Configurar los pines de los sensores como entrada y los pines de los LEDs como salida
+GPIO.setup(Pin_Sensor1, GPIO.IN)
+GPIO.setup(Pin_Sensor2, GPIO.IN)
+GPIO.setup(Pin_Sensor3, GPIO.IN)
+GPIO.setup(Pin_Sensor4, GPIO.IN)
+
+GPIO.setup(Pin_Led1, GPIO.OUT)
+GPIO.setup(Pin_Led2, GPIO.OUT)
+GPIO.setup(Pin_Led3, GPIO.OUT)
+GPIO.setup(Pin_Led4, GPIO.OUT)
+
+try:
+    while True:
+        # Leer el estado de cada sensor
+        sensor_state1 = GPIO.input(Pin_Sensor1)
+        sensor_state2 = GPIO.input(Pin_Sensor2)
+        sensor_state3 = GPIO.input(Pin_Sensor3)
+        sensor_state4 = GPIO.input(Pin_Sensor4)
+        
+        # Controlar cada LED según el estado de su sensor correspondiente
+        GPIO.output(Pin_Led1, GPIO.LOW if sensor_state1 == 0 else GPIO.HIGH)
+        GPIO.output(Pin_Led2, GPIO.LOW if sensor_state2 == 0 else GPIO.HIGH)
+        GPIO.output(Pin_Led3, GPIO.LOW if sensor_state3 == 0 else GPIO.HIGH)
+        GPIO.output(Pin_Led4, GPIO.LOW if sensor_state4 == 0 else GPIO.HIGH)
+        
+        time.sleep(0.1)  # Pequeña pausa para evitar una carga excesiva de la CPU
+
+except KeyboardInterrupt:
+    pass  # Permitir salir del bucle con Ctrl+C
+
+finally:
+    GPIO.cleanup()  # Limpiar la configuración de los pines GPIO
