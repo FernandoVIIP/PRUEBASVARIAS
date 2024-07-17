@@ -378,5 +378,5 @@ class EstacionamientoGUI:
 if __name__ == "__main__":
     root = tk.Tk()
     app = EstacionamientoGUI(root)
-    root.mainloop()
+    root.mainloop() #ESTE CODIGO SI JALO 
     
