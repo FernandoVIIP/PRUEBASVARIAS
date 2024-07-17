@@ -541,3 +541,111 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = EstacionamientoGUI(root)
     root.mainloop()
+
+
+
+
+#AHORA CON IMAGEN DE FONDO SEGÚN 
+
+
+
+import tkinter as tk
+from PIL import Image, ImageTk
+import RPi.GPIO as GPIO
+
+# Pines GPIO para los sensores y LEDs
+Pin_Sensor1 = 5   # Pin GPIO para la señal del sensor de obstáculos 1 (Docentes)
+Pin_Led1 = 25     # Pin GPIO para el LED 1 (Docentes)
+
+Pin_Sensor2 = 6   # Pin GPIO para la señal del sensor de obstáculos 2 (Estudiantes)
+Pin_Led2 = 26     # Pin GPIO para el LED 2 (Estudiantes)
+
+Pin_Sensor3 = 13  # Pin GPIO para la señal del sensor de obstáculos 3 (Estudiantes)
+Pin_Led3 = 19     # Pin GPIO para el LED 3 (Estudiantes)
+
+Pin_Sensor4 = 20  # Pin GPIO para la señal del sensor de obstáculos 4 (Administrativos)
+Pin_Led4 = 21     # Pin GPIO para el LED 4 (Administrativos)
+
+# Configuración de los pines GPIO
+GPIO.setmode(GPIO.BCM)  
+GPIO.setup(Pin_Sensor1, GPIO.IN)
+GPIO.setup(Pin_Led1, GPIO.OUT)
+GPIO.setup(Pin_Sensor2, GPIO.IN)
+GPIO.setup(Pin_Led2, GPIO.OUT)
+GPIO.setup(Pin_Sensor3, GPIO.IN)
+GPIO.setup(Pin_Led3, GPIO.OUT)
+GPIO.setup(Pin_Sensor4, GPIO.IN)
+GPIO.setup(Pin_Led4, GPIO.OUT)
+GPIO.setwarnings(False)
+
+class EstacionamientoGUI:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Estacionamiento - Universidad Politécnica de Tapachula")
+
+        # Cargar la imagen de fondo
+        self.bg_image = Image.open("background.jpg")
+        self.bg_image = self.bg_image.resize((800, 600), Image.ANTIALIAS)
+        self.bg_photo = ImageTk.PhotoImage(self.bg_image)
+
+        self.background_label = tk.Label(self.root, image=self.bg_photo)
+        self.background_label.place(x=0, y=0, relwidth=1, relheight=1)
+
+        # Crear frames para los cajones
+        self.docentes_frame = tk.LabelFrame(self.root, text="Docentes", padx=30, pady=30, font=("Arial", 12, "bold"), bg="#f0f0f0")
+        self.docentes_frame.grid(row=0, column=0, padx=20, pady=20, sticky="nsew")
+        self.docentes_cajones = self.crear_cajones_estacionamiento(self.docentes_frame, 1, "D")
+
+        self.estudiantes_frame = tk.LabelFrame(self.root, text="Estudiantes", padx=30, pady=30, font=("Arial", 12, "bold"), bg="#f0f0f0")
+        self.estudiantes_frame.grid(row=0, column=1, padx=20, pady=20, sticky="nsew")
+        self.estudiantes_cajones = self.crear_cajones_estacionamiento(self.estudiantes_frame, 2, "E")
+
+        self.administrativos_frame = tk.LabelFrame(self.root, text="Administrativos", padx=30, pady=30, font=("Arial", 12, "bold"), bg="#f0f0f0")
+        self.administrativos_frame.grid(row=0, column=2, padx=20, pady=20, sticky="nsew")
+        self.administrativos_cajones = self.crear_cajones_estacionamiento(self.administrativos_frame, 1, "A")
+
+        self.root.grid_columnconfigure(0, weight=1)
+        self.root.grid_columnconfigure(1, weight=1)
+        self.root.grid_columnconfigure(2, weight=1)
+
+        self.actualizar_cajones()
+
+    def crear_cajones_estacionamiento(self, frame, cantidad, tipo):
+        cajones = []
+        for i in range(cantidad):
+            cajon_texto = tipo + str(i + 1)
+            cajon = tk.Label(frame, text=cajon_texto, padx=40, pady=40, relief=tk.RAISED, borderwidth=2, bg="green", font=("Arial", 10, "bold"))
+            cajon.grid(row=i // 2, column=i % 2, padx=15, pady=15)
+            cajones.append(cajon)
+        return cajones
+
+    def actualizar_cajones(self):
+        # Estado y color del cajón de Docentes
+        sensor_state1D = GPIO.input(Pin_Sensor1)
+        nuevo_color_docentes = "red" if sensor_state1D == 0 else "green"
+        self.docentes_cajones[0].config(bg=nuevo_color_docentes)
+        GPIO.output(Pin_Led1, GPIO.LOW if sensor_state1D == 0 else GPIO.HIGH)
+
+        # Estado y color de los cajones de Estudiantes
+        sensor_state2E = GPIO.input(Pin_Sensor2)
+        nuevo_color_estudiantes_1 = "red" if sensor_state2E == 0 else "green"
+        self.estudiantes_cajones[0].config(bg=nuevo_color_estudiantes_1)
+        GPIO.output(Pin_Led2, GPIO.LOW if sensor_state2E == 0 else GPIO.HIGH)
+
+        sensor_state3E = GPIO.input(Pin_Sensor3)
+        nuevo_color_estudiantes_2 = "red" if sensor_state3E == 0 else "green"
+        self.estudiantes_cajones[1].config(bg=nuevo_color_estudiantes_2)
+        GPIO.output(Pin_Led3, GPIO.LOW if sensor_state3E == 0 else GPIO.HIGH)
+
+        # Estado y color del cajón de Administrativos
+        sensor_state4A = GPIO.input(Pin_Sensor4)
+        nuevo_color_administrativos = "red" if sensor_state4A == 0 else "green"
+        self.administrativos_cajones[0].config(bg=nuevo_color_administrativos)
+        GPIO.output(Pin_Led4, GPIO.LOW if sensor_state4A == 0 else GPIO.HIGH)
+        
+        self.root.after(1000, self.actualizar_cajones)  # Actualiza cada segundo
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = EstacionamientoGUI(root)
+    root.mainloop()
