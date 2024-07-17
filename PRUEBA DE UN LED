@@ -465,7 +465,7 @@ Pin_Led2 = 26     # Pin GPIO para el LED 2 (Estudiantes)
 Pin_Sensor3 = 13  # Pin GPIO para la señal del sensor de obstáculos 3 (Estudiantes)
 Pin_Led3 = 19     # Pin GPIO para el LED 3 (Estudiantes)
 
-Pin_Sensor4 = 19  # Pin GPIO para la señal del sensor de obstáculos 4 (Administrativos)
+Pin_Sensor4 = 20  # Pin GPIO para la señal del sensor de obstáculos 4 (Administrativos)
 Pin_Led4 = 21     # Pin GPIO para el LED 4 (Administrativos)
 
 # Configuración de los pines GPIO
